@@ -5,22 +5,24 @@ import json
 import uuid
 
 # =========================
-# PAGE SETTINGS
+# PAGE CONFIG
 # =========================
 
 st.set_page_config(
     page_title="NOVA",
+    
     layout="wide"
 )
 
 # =========================
-# GROQ CLIENT
+# OPENAI / GROQ CLIENT
 # =========================
 
 client = OpenAI(
     api_key=st.secrets["GROQ_API_KEY"],
     base_url="https://api.groq.com/openai/v1"
 )
+
 # =========================
 # CHAT STORAGE
 # =========================
@@ -37,6 +39,7 @@ if not os.path.exists(CHAT_DIR):
 def get_chat_path(chat_id):
     return os.path.join(CHAT_DIR, f"{chat_id}.json")
 
+
 def load_chat(chat_id):
 
     path = get_chat_path(chat_id)
@@ -51,12 +54,14 @@ def load_chat(chat_id):
         "messages": []
     }
 
+
 def save_chat(chat_id, data):
 
     path = get_chat_path(chat_id)
 
     with open(path, "w") as file:
         json.dump(data, file)
+
 
 def get_all_chats():
 
@@ -98,7 +103,7 @@ if "current_chat" not in st.session_state:
 
 with st.sidebar:
 
-    st.title(" NOVA")
+    st.title( "NOVA")
 
     if st.button("➕ New Chat"):
 
@@ -164,10 +169,10 @@ messages = chat_data["messages"]
 # MAIN UI
 # =========================
 
-st.title("NOVA")
+st.title(" NOVA")
 st.caption("Your AI assistant")
 
-# DISPLAY MESSAGES
+# DISPLAY CHAT HISTORY
 
 for message in messages:
 
@@ -189,29 +194,29 @@ if prompt:
         "content": prompt
     })
 
-    # SHOW USER MESSAGE
+    # DISPLAY USER MESSAGE
 
     with st.chat_message("user"):
         st.write(prompt)
 
     # AI RESPONSE
 
-   # AI RESPONSE
+    with st.chat_message("assistant"):
 
-with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
 
-    with st.spinner("Thinking..."):
+            response = client.chat.completions.create(
 
-        response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+                model="llama-3.1-8b-instant",
 
-            messages=[
-                {
-                    "role": "system",
-                    "content": """
+                messages=[
+
+                    {
+                        "role": "system",
+                        "content": """
 You are NOVA, a futuristic AI assistant created by Suvrajeet Chatterjee.
 
-Your personality is intelligent, helpful, modern, and conversational.
+Your personality is intelligent, modern, conversational, and helpful.
 
 If someone asks:
 - your name
@@ -219,33 +224,33 @@ If someone asks:
 - how you were built
 - what technologies were used
 
-you should answer confidently and accurately.
+you should answer confidently and professionally.
 
 You were built using:
 - Python
 - Streamlit
 - Groq API
-- Llama 3.1 model
+- Llama 3.1
 - JSON-based chat storage
 - GitHub
 - Streamlit Cloud deployment
 
 You support:
 - multi-chat conversations
-- persistent chat storage
-- conversational AI interaction
+- persistent chat architecture
+- AI interaction
 
 Always mention that you were created by Suvrajeet Chatterjee when relevant.
-
-When explaining your development process, give detailed and professional answers.
 """
-                }
-            ] + messages
-        )
+                    }
 
-        reply = response.choices[0].message.content
+                ] + messages
+            )
 
-        st.write(reply)
+            reply = response.choices[0].message.content
+
+            st.write(reply)
+
     # SAVE AI RESPONSE
 
     messages.append({
@@ -253,9 +258,9 @@ When explaining your development process, give detailed and professional answers
         "content": reply
     })
 
-    # AUTO TITLE
+    # AUTO CHAT TITLE
 
-    if chat_data["title"] == "New Chat":
+    if chat_data["title"] == "New Chat" and prompt:
 
         short_title = prompt[:30]
 
