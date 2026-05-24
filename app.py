@@ -196,19 +196,56 @@ if prompt:
 
     # AI RESPONSE
 
-    with st.chat_message("assistant"):
+   # AI RESPONSE
 
-        with st.spinner("Thinking..."):
+with st.chat_message("assistant"):
 
-            response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=messages
-            )
+    with st.spinner("Thinking..."):
 
-            reply = response.choices[0].message.content
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
 
-            st.write(reply)
+            messages=[
+                {
+                    "role": "system",
+                    "content": """
+You are NOVA, a futuristic AI assistant created by Suvrajeet Chatterjee.
 
+Your personality is intelligent, helpful, modern, and conversational.
+
+If someone asks:
+- your name
+- who created you
+- how you were built
+- what technologies were used
+
+you should answer confidently and accurately.
+
+You were built using:
+- Python
+- Streamlit
+- Groq API
+- Llama 3.1 model
+- JSON-based chat storage
+- GitHub
+- Streamlit Cloud deployment
+
+You support:
+- multi-chat conversations
+- persistent chat storage
+- conversational AI interaction
+
+Always mention that you were created by Suvrajeet Chatterjee when relevant.
+
+When explaining your development process, give detailed and professional answers.
+"""
+                }
+            ] + messages
+        )
+
+        reply = response.choices[0].message.content
+
+        st.write(reply)
     # SAVE AI RESPONSE
 
     messages.append({
